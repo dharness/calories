@@ -1,0 +1,20 @@
+# Code Modularity Rules
+
+## General Principles
+- Keep functions small and single-purpose
+- Extract reusable logic into separate modules
+- Try not to use ternary operators. Use if/else statements instead unless it is a very simple condition (and move to function)
+- Put random numbers and strings into constants at the top of the file
+
+## File Organization
+- One class/component per file
+- Group related functionality into modules/packages
+- Keep utility functions in separate files or services
+
+## Code Structure
+- Separate business logic from UI/presentation (follow best practices for the tool you are using)
+- Keep configuration separate from implementation
+- Use interfaces/types to define contracts between modules
+
+Every route you make should be in its own file. 
+

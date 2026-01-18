@@ -1,0 +1,11 @@
+.env 
+node_modules/
+.cursor/
+.vscode/
+.bun/
+.DS_Store
+.vscode/
+.history/
+.DS_Store
+.idea/
+usda_cache.db
