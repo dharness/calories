@@ -18,3 +18,5 @@
 
 Every route you make should be in its own file. 
 
+#### Try-Catch
+We do not need to try catch every little thing. Only try-catch if there is likely to be a big difficult to find error. Otherwise, focus on writing the code clean and concise and let the error propagate.

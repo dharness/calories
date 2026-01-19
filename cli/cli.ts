@@ -269,6 +269,8 @@ const main = async (): Promise<void> => {
 };
 
 main().catch((error) => {
+  const { logError } = require("../server/utils/errorLogger");
+  logError(error, { context: "cli_main" });
   console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 });

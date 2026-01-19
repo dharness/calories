@@ -1,0 +1,38 @@
+[
+  {
+    "fdcId": 746784,
+    "description": "Sugars, granulated",
+    "commonNames": "sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose;sucrose",
+    "additionalDescriptions": "",
+    "dataType": "Foundation",
+    "publishedDate": "2019-12-16",
+    "foodCategory": "Sweets"
+  },
+  {
+    "fdcId": 2644291,
+    "description": "Peas, green, sweet, canned, sodium added, sugar added, drained and rinsed",
+    "commonNames": "",
+    "additionalDescriptions": "",
+    "dataType": "Foundation",
+    "publishedDate": "2023-10-26",
+    "foodCategory": "Vegetables and Vegetable Products"
+  },
+  {
+    "fdcId": 2644289,
+    "description": "Beans, kidney, dark red, canned, sodium added, sugar added, drained and rinsed",
+    "commonNames": "",
+    "additionalDescriptions": "",
+    "dataType": "Foundation",
+    "publishedDate": "2023-10-26",
+    "foodCategory": "Legumes and Legume Products"
+  },
+  {
+    "fdcId": 2644290,
+    "description": "Beans, kidney, light red, canned, sodium added, sugar added, drained and rinsed",
+    "commonNames": "",
+    "additionalDescriptions": "",
+    "dataType": "Foundation",
+    "publishedDate": "2023-10-26",
+    "foodCategory": "Legumes and Legume Products"
+  }
+]

@@ -1,25 +1,11 @@
-import { config as loadEnv } from "dotenv";
-
-import { LLMClient } from "./llmClient";
+import { initializeClients } from "./init";
+import { getLLMClient } from "./llmClient";
 import { getFoodDetails, GetFoodDetailsInput } from "./services/getFoodDetails";
 import { parseIngredients } from "./services/ingredientParser";
 import { publicProcedure, router } from "./trpc";
-import { USDANutritionClient } from "./usdaClient";
+import { getUSDAClient } from "./usdaClient";
 
-loadEnv();
-
-const usdaKey = process.env.USDA_API_KEY;
-if (!usdaKey) {
-  throw new Error("Missing required environment variable: USDA_API_KEY");
-}
-
-const geminiKey = process.env.GEMINI_API_KEY;
-if (!geminiKey) {
-  throw new Error("Missing required environment variable: GEMINI_API_KEY");
-}
-
-const usdaClient = new USDANutritionClient(usdaKey);
-const llmClient = new LLMClient(geminiKey);
+initializeClients();
 
 interface SearchInput {
   query: string;
@@ -46,7 +32,7 @@ export const appRouter = router({
         throw new Error("Missing search query");
       }
 
-      const results = await usdaClient.searchFoods(
+      const results = await getUSDAClient().searchFoods(
         trimmedQuery,
         input.limit ?? 10,
         "Foundation"
@@ -66,8 +52,8 @@ export const appRouter = router({
       const unitStr = input.unit?.trim() || "g";
 
       const result = input.fdcId
-        ? await usdaClient.getCaloriesByFdcId(qty, unitStr, input.fdcId)
-        : await usdaClient.getCalories(qty, unitStr, trimmedName);
+        ? await getUSDAClient().getCaloriesByFdcId(qty, unitStr, input.fdcId)
+        : await getUSDAClient().getCalories(qty, unitStr, trimmedName);
 
       return {
         name: trimmedName || (result.meta.description as string) || "",
@@ -81,14 +67,14 @@ export const appRouter = router({
   optimize: publicProcedure
     .input((val: unknown): OptimizeInput => val as OptimizeInput)
     .query(async ({ input }) => {
-      const ingredients = await parseIngredients(input.recipeText, llmClient);
+      const ingredients = await parseIngredients(input.recipeText);
       return { ingredients };
     }),
 
   getFoodDetails: publicProcedure
     .input((val: unknown): GetFoodDetailsInput => val as GetFoodDetailsInput)
     .query(async ({ input }) => {
-      const foodDetails = await getFoodDetails(input.ingredientName, usdaClient);
+      const foodDetails = await getFoodDetails(input.ingredientName);
       return { foodDetails };
     }),
 });

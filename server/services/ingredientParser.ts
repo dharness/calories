@@ -1,4 +1,5 @@
-import { LLMClient } from "../llmClient";
+import { z } from "zod";
+import { getLLMClient } from "../llmClient";
 
 export type Ingredient = {
   quantity: number;
@@ -6,32 +7,17 @@ export type Ingredient = {
   name: string;
 };
 
-const INGREDIENT_SCHEMA = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      quantity: {
-        type: "number",
-        description: "The quantity of the ingredient as a number (e.g., 2, 1.5, 0.5)",
-      },
-      unit: {
-        type: "string",
-        description: "The unit of measurement (e.g., 'cups', 'tsp', 'tbsp', 'oz', 'g', or empty string if no unit)",
-      },
-      name: {
-        type: "string",
-        description: "The name of the ingredient",
-      },
-    },
-    required: ["quantity", "unit", "name"],
-  },
-};
+const IngredientSchema = z.object({
+  quantity: z.number().describe("The quantity of the ingredient as a number (e.g., 2, 1.5, 0.5)"),
+  unit: z.string().describe("The unit of measurement (e.g., 'cups', 'tsp', 'tbsp', 'oz', 'g', or empty string if no unit)"),
+  name: z.string().describe("The name of the ingredient"),
+});
+
+const IngredientsArraySchema = z.array(IngredientSchema).describe("Array of ingredients extracted from the recipe");
 
 // Parse recipe text into structured ingredients using LLM with guided decoding
 export async function parseIngredients(
-  recipeText: string,
-  llmClient: LLMClient
+  recipeText: string
 ): Promise<Ingredient[]> {
   const prompt = `Parse the following recipe text and extract all ingredients. Return only the ingredients as a JSON array.
 
@@ -51,9 +37,10 @@ Ignore any instructions, directions, or non-ingredient text.`;
 
 console.log("prompt", prompt);
 
-  const result = await llmClient.generateWithSchema<Ingredient[]>(
+  const result = await getLLMClient().generateWithZodSchema<Ingredient[]>(
     prompt,
-    INGREDIENT_SCHEMA
+    IngredientsArraySchema,
+    "Ingredients"
   );
 
   if (Array.isArray(result)) {

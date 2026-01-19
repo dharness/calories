@@ -1,15 +1,53 @@
 import { getCached, setCached } from "./usdaCache";
+import { logError } from "./utils/errorLogger";
+
+export enum USDADataType {
+  Foundation = "Foundation",
+  SRLegacy = "SR Legacy",
+  Branded = "Branded",
+  SurveyFNDDS = "Survey (FNDDS)",
+  ExperimentalFoods = "Experimental",
+}
 
 export type USDAResult = {
   calories: number;
   meta: Record<string, unknown>;
 };
 
+export type FoodSearchResult = {
+  fdcId: number;
+  description: string;
+  lowercaseDescription: string;
+  commonNames: string;
+  additionalDescriptions: string;
+  dataType: string;
+  publishedDate: string;
+  foodCategory: string;
+};
+
 const USDA_SEARCH_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/foods/search";
 const USDA_FOOD_ENDPOINT = "https://api.nal.usda.gov/fdc/v1/food";
 
+let usdaClientInstance: USDANutritionClient | null = null;
+
+export function initializeUSDAClient(apiKey: string): void {
+  if (usdaClientInstance) {
+    throw new Error("USDANutritionClient has already been initialized");
+  }
+  usdaClientInstance = new USDANutritionClient(apiKey);
+}
+
+export function getUSDAClient(): USDANutritionClient {
+  if (!usdaClientInstance) {
+    throw new Error(
+      "USDANutritionClient has not been initialized. Call initializeUSDAClient() first."
+    );
+  }
+  return usdaClientInstance;
+}
+
 export class USDANutritionClient {
-  constructor(private apiKey: string) {}
+  constructor(private apiKey: string) { }
 
   async getCalories(
     quantity: number,
@@ -58,37 +96,81 @@ export class USDANutritionClient {
   async searchFoods(
     query: string,
     limit = 10,
-    dataType?: string
-  ): Promise<Array<{ fdcId: number; description: string }>> {
+    dataType?: USDADataType | string
+  ): Promise<FoodSearchResult[]> {
     const params = new URLSearchParams({
       api_key: this.apiKey,
       query: query.trim(),
       pageSize: String(limit),
     });
-    
+
     // Add dataType filter if provided
     if (dataType) {
       params.append("dataType", dataType);
     }
-    
+
     const response = await fetch(`${USDA_SEARCH_ENDPOINT}?${params.toString()}`);
     if (!response.ok) {
       const body = await response.text();
-      throw new Error(
+      const error = new Error(
         `USDA search failed: ${response.status} ${response.statusText} ${body}`
       );
+      logError(error, {
+        context: "usdaClient.searchFoods",
+        query,
+        status: response.status,
+        statusText: response.statusText,
+      });
+      throw error;
     }
     const data = await response.json();
     const foods = data?.foods ?? [];
-    return foods.map((food: any) => ({
+
+    return foods.map((food: any) => this.extractFoodFields(food));
+  }
+
+  private extractFoodFields(food: any): FoodSearchResult {
+    return {
       fdcId: food.fdcId,
-      description: food.description || food.brandOwner || "Unknown",
-    }));
+      description: food.description,
+      lowercaseDescription: food.lowercaseDescription,
+      commonNames: food.commonNames,
+      additionalDescriptions: food.additionalDescriptions,
+      dataType: food.dataType,
+      publishedDate: food.publishedDate,
+      foodCategory: food.foodCategory,
+    };
+  }
+
+  async multiSearchFoods(
+    queries: string[],
+    limit = 10,
+    dataType?: USDADataType
+  ): Promise<FoodSearchResult[]> {
+    const searchPromises = queries.map((query) =>
+      this.searchFoods(query, limit, dataType)
+    );
+    const resultsArray = await Promise.all(searchPromises);
+
+    // Flatten results and keep unique ones by fdcId
+    const seenFdcIds = new Set<number>();
+    const uniqueResults: FoodSearchResult[] = [];
+
+    for (const results of resultsArray) {
+      for (const food of results) {
+        if (!seenFdcIds.has(food.fdcId)) {
+          seenFdcIds.add(food.fdcId);
+          uniqueResults.push(food);
+        }
+      }
+    }
+
+    return uniqueResults;
   }
 
   private async searchFood(name: string): Promise<any> {
     // Search Foundation Foods first
-    const results = await this.searchFoods(name, 1, "Foundation");
+    const results = await this.searchFoods(name, 1, USDADataType.Foundation);
     if (!results.length) {
       throw new Error(`No USDA foods found for '${name}'.`);
     }
@@ -109,15 +191,22 @@ export class USDANutritionClient {
     );
     if (!response.ok) {
       const body = await response.text();
-      throw new Error(
+      const error = new Error(
         `USDA food lookup failed: ${response.status} ${response.statusText} ${body}`
       );
+      logError(error, {
+        context: "usdaClient.getFoodDetails",
+        fdcId,
+        status: response.status,
+        statusText: response.statusText,
+      });
+      throw error;
     }
     const data = await response.json();
-    
+
     // Store in cache
     setCached(fdcId, data);
-    
+
     return data;
   }
 
@@ -131,12 +220,12 @@ export class USDANutritionClient {
       const unitName =
         nutrient?.unitName ?? nutrient?.nutrient?.unitName ?? "";
       const value = nutrient?.value ?? nutrient?.amount ?? 0;
-      
+
       // Check for standard Energy nutrient (ID 1008)
       if (nutrientId === 1008) {
         return Number(value) || 0;
       }
-      
+
       // Check for Energy with kcal unit (exact match or contains "Energy")
       const normalizedUnit = String(unitName).toLowerCase();
       if (normalizedUnit === "kcal") {

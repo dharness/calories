@@ -1,0 +1,101 @@
+API Key loaded: 2SeLHG02...
+Searching USDA API for: "white sugar"
+============================================================
+
+Found 20 results:
+
+DUPLICATE DESCRIPTIONS FOUND:
+------------------------------------------------------------
+"sugars, granulated" appears 2 times:
+  - FDC ID: 746784
+  - FDC ID: 169655
+
+ALL RESULTS:
+------------------------------------------------------------
+1. FDC ID: 2710258
+   Description: Sugar, white, granulated or lump
+
+2. FDC ID: 2710259
+   Description: Sugar, white, confectioner's, powdered
+
+3. FDC ID: 2710262
+   Description: Sugar substitute and sugar blend
+
+4. FDC ID: 2707988
+   Description: Cookie, sugar or plain, sugar free
+
+5. FDC ID: 2707989
+   Description: Cookie, sugar wafer, sugar free
+
+6. FDC ID: 2710260
+   Description: Sugar, brown
+
+7. FDC ID: 2710261
+   Description: Sugar, cinnamon
+
+8. FDC ID: 2710257
+   Description: Sugar, NFS
+
+9. FDC ID: 2707559
+   Description: Peanut butter and jelly sandwich, with regular peanut butter, reduced sugar jelly, on white bread
+
+10. FDC ID: 170674
+   Description: Sugar, turbinado
+
+11. FDC ID: 168833
+   Description: Sugars, brown
+
+12. FDC ID: 746784
+   Description: Sugars, granulated
+
+13. FDC ID: 169655
+   Description: Sugars, granulated
+
+14. FDC ID: 169658
+   Description: Sugars, maple
+
+15. FDC ID: 169656
+   Description: Sugars, powdered
+
+16. FDC ID: 174970
+   Description: Cookies, sugar wafer, with creme filling, sugar free
+
+17. FDC ID: 2710321
+   Description: Popsicle, no sugar added
+
+18. FDC ID: 2710696
+   Description: Sangria, white
+
+19. FDC ID: 2708487
+   Description: Cereal, reduced sugar
+
+20. FDC ID: 2707970
+   Description: Cookie, butter or sugar
+
+============================================================
+DETAILED ANALYSIS (first 3 results):
+============================================================
+
+Result 1: Sugar, white, granulated or lump (FDC ID: 2710258)
+  Data Type: Survey (FNDDS)
+  Brand Owner: N/A
+  GTIN/UPC: N/A
+  Publication Date: 10/31/2024
+  Food Code: 91101010
+  Energy (kcal/100g): 401
+
+Result 2: Sugar, white, confectioner's, powdered (FDC ID: 2710259)
+  Data Type: Survey (FNDDS)
+  Brand Owner: N/A
+  GTIN/UPC: N/A
+  Publication Date: 10/31/2024
+  Food Code: 91101020
+  Energy (kcal/100g): 389
+
+Result 3: Sugar substitute and sugar blend (FDC ID: 2710262)
+  Data Type: Survey (FNDDS)
+  Brand Owner: N/A
+  GTIN/UPC: N/A
+  Publication Date: 10/31/2024
+  Food Code: 91106010
+  Energy (kcal/100g): 399
